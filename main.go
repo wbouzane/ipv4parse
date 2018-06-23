@@ -35,12 +35,13 @@ func parse(w http.ResponseWriter, r *http.Request) {
 
 		var ip []string
 		var text string
-		re, _ := regexp.Compile("(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])")
+		re, _ := regexp.Compile("(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])")
 		r.ParseForm()
 
 		text = strings.Join(r.Form["text"], " ")
 		ip = re.FindAllString(text, -1)
 		sort.Strings(ip)
+		ip = unique(ip)
 
 		for _, v := range ip {
 			fmt.Fprint(w, v)
@@ -59,4 +60,22 @@ func parse(w http.ResponseWriter, r *http.Request) {
 			fmt.Fprint(w, "\n\n")
 		}
 	}
+}
+
+func unique(s []string) []string {
+	m := make(map[string]bool)
+	for _, item := range s {
+		if _, ok := m[item]; ok {
+			// duplicate item
+			fmt.Println(item, "is a duplicate")
+		} else {
+			m[item] = true
+		}
+	}
+
+	var result []string
+	for item, _ := range m {
+		result = append(result, item)
+	}
+	return result
 }
