@@ -19,7 +19,6 @@ func main() {
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
 	}
-
 }
 
 func parse(w http.ResponseWriter, r *http.Request) {
@@ -44,8 +43,11 @@ func parse(w http.ResponseWriter, r *http.Request) {
 		ip = unique(ip)
 
 		for _, v := range ip {
-			fmt.Fprint(w, v)
-			fmt.Fprint(w, "\n")
+			fmt.Fprint(w, v, " ")
+			//fmt.Fprint(w, "\n")
+			addr, err := net.LookupAddr(v)
+			fmt.Fprint(w, addr, "\n")
+			//fmt.Fprint(w, "\n")
 			i := net.ParseIP(v)
 			record, err := db.City(i)
 			if err != nil {
@@ -74,7 +76,7 @@ func unique(s []string) []string {
 	}
 
 	var result []string
-	for item, _ := range m {
+	for item := range m {
 		result = append(result, item)
 	}
 	return result
